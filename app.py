@@ -1,3 +1,4 @@
+import os
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
@@ -6,6 +7,10 @@ from pydantic import BaseModel
 from typing import Optional
 import gspread
 from oauth2client.service_account import ServiceAccountCredentials
+
+CREDENTIALS_PATH = os.getenv("C:/Users/ricky/OneDrive/My\ folders/Finances/secure_credentials", "credentials.json")
+
+creds = ServiceAccountCredentials.from_json_keyfile_name(CREDENTIALS_PATH)
 
 app = FastAPI()
 
