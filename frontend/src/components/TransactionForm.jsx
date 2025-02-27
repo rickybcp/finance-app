@@ -62,7 +62,7 @@ const TransactionForm = ({ onTransactionAdded }) => {
         });
 
         try {
-            const response = await axios.post("http://127.0.0.1:8000/add_entry", {
+            const response = await axios.post("https://finance-app-w0ya.onrender.com/add_entry", {
                 ...updatedFormData,
                 date: new Date(updatedFormData.date).toISOString().split("T")[0]
             });
