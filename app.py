@@ -1,4 +1,5 @@
 import os
+import json
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
@@ -8,9 +9,17 @@ from typing import Optional
 import gspread
 from oauth2client.service_account import ServiceAccountCredentials
 
-CREDENTIALS_PATH = os.getenv("C:/Users/ricky/OneDrive/My\ folders/Finances/secure_credentials", "credentials.json")
+SCOPES = [
+    "https://www.googleapis.com/auth/spreadsheets",  # Access Google Sheets
+    "https://www.googleapis.com/auth/drive"  # Access Google Drive (needed for Sheets)
+]
 
-creds = ServiceAccountCredentials.from_json_keyfile_name(CREDENTIALS_PATH)
+credentials_json = os.getenv("GOOGLE_CREDENTIALS_JSON")
+if credentials_json:
+    creds_dict = json.loads(credentials_json)
+    creds = ServiceAccountCredentials.from_json_keyfile_dict(creds_dict, SCOPES)
+else:
+    raise Exception("Missing GOOGLE_CREDENTIALS_JSON environment variable")
 
 app = FastAPI()
 
