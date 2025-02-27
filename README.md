@@ -68,7 +68,7 @@ npm start
 ### **🔹 Backend (FastAPI) on Render**
 1. Push the backend to GitHub  
 2. Deploy via **[Render](https://render.com/)**  
-3. Use the API URL: `https://your-app.onrender.com`
+3. Use the API URL: `https://finance-app-w0ya.onrender.com/`
 
 ### **🔹 Frontend (React) on Vercel**
 1. Push the frontend to GitHub  
