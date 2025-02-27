@@ -10,16 +10,25 @@ import gspread
 from oauth2client.service_account import ServiceAccountCredentials
 
 SCOPES = [
-    "https://www.googleapis.com/auth/spreadsheets",  # Access Google Sheets
-    "https://www.googleapis.com/auth/drive"  # Access Google Drive (needed for Sheets)
+    "https://www.googleapis.com/auth/spreadsheets",
+    "https://www.googleapis.com/auth/drive"
 ]
 
-credentials_json = os.getenv("GOOGLE_CREDENTIALS_JSON")
-if credentials_json:
-    creds_dict = json.loads(credentials_json)
-    creds = ServiceAccountCredentials.from_json_keyfile_dict(creds_dict, SCOPES)
-else:
-    raise Exception("Missing GOOGLE_CREDENTIALS_JSON environment variable")
+def get_google_sheet():
+    try:
+        # Load credentials from environment variable
+        credentials_json = os.getenv("GOOGLE_CREDENTIALS_JSON")
+        if not credentials_json:
+            raise Exception("Missing GOOGLE_CREDENTIALS_JSON environment variable")
+
+        creds_dict = json.loads(credentials_json)
+        creds = ServiceAccountCredentials.from_json_keyfile_dict(creds_dict, SCOPES)
+
+        client = gspread.authorize(creds)
+        return client.open_by_key("1qtK11Ko7wN6gii075ckKItmoNsF0i5PmlLm7CyW-Z4Y").sheet1  # Replace with actual ID
+    except Exception as e:
+        print("🚨 Google Sheets auth failed:", str(e))
+        raise e
 
 app = FastAPI()
 
@@ -30,17 +39,6 @@ app.add_middleware(
     allow_methods=["*"],  # ✅ Allow all HTTP methods (GET, POST, etc.)
     allow_headers=["*"],  # ✅ Allow all headers
 )
-
-
-# Configuration de l'API Google Sheets
-SCOPES = ["https://spreadsheets.google.com/feeds", "https://www.googleapis.com/auth/drive"]
-CREDENTIALS_FILE = "credentials.json"  # Fichier JSON des credentials Google
-SPREADSHEET_ID = "1qtK11Ko7wN6gii075ckKItmoNsF0i5PmlLm7CyW-Z4Y"  # Remplace par l'ID de ton Google Sheets
-
-def get_google_sheet():
-    creds = ServiceAccountCredentials.from_json_keyfile_name(CREDENTIALS_FILE, SCOPES)
-    client = gspread.authorize(creds)
-    return client.open_by_key(SPREADSHEET_ID).sheet1
 
 @app.get("/")
 def read_root():
