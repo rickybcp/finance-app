@@ -24,7 +24,7 @@ const TransactionForm = ({ onTransactionAdded }) => {
     });
 
     useEffect(() => {
-        axios.get("http://127.0.0.1:8000/get_dropdown_options")
+        axios.get("https://finance-app-w0ya.onrender.com/get_dropdown_options")
             .then(response => {
                 console.log("Dropdown Data:", response.data);  // Debugging log
                 const formatOptions = (options) => {
