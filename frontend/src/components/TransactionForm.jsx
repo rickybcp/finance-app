@@ -11,9 +11,17 @@ const TransactionForm = ({ onTransactionAdded }) => {
         beneficiaire: "",
         frequence: "",
         details: "",
-        fuel_cost: "",
-        new_value: "" // Stores new input value if user adds a new option
+        fuel_cost: ""
     });
+
+    const [newValues, setNewValues] = useState({
+        titre: "",
+        type_transaction: "",
+        compte: "",
+        beneficiaire: "",
+        frequence: ""
+    });
+
 
     const [dropdownData, setDropdownData] = useState({
         categories: [],
@@ -49,17 +57,22 @@ const TransactionForm = ({ onTransactionAdded }) => {
         setFormData({ ...formData, [e.target.name]: e.target.value });
     };
 
+    const handleNewValueChange = (e, field) => {
+        setNewValues({ ...newValues, [field]: e.target.value });
+    };
+
+
     const handleSubmit = async (e) => {
         e.preventDefault();
 
         let updatedFormData = { ...formData };
 
         // If user added a new value, replace the field with new_value
-        Object.keys(dropdownData).forEach(field => {
-            if (formData[field] === "new" && formData.new_value) {
-                updatedFormData[field] = formData.new_value;
-            }
-        });
+            Object.keys(newValues).forEach(field => {
+                if (formData[field] === "new" && newValues[field]) {
+                    updatedFormData[field] = newValues[field];
+                }
+            });
 
         try {
             const response = await axios.post("https://finance-app-w0ya.onrender.com/add_entry", {
@@ -100,8 +113,8 @@ const TransactionForm = ({ onTransactionAdded }) => {
                         <input
                             type="text"
                             placeholder={`Nouvelle ${label}`}
-                            value={formData.new_value || ""}
-                            onChange={(e) => setFormData({ ...formData, new_value: e.target.value })}
+                            value={newValues[name] || ""}
+                            onChange={(e) => handleNewValueChange(e, name)}
                             className="border p-2 rounded w-full mt-2"
                         />
                     )}
