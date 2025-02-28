@@ -59,12 +59,12 @@ class FinanceEntry(BaseModel):
     date: date
     categorie: str
     type_transaction: str
-    amount: str
+    amount: float
     compte: str
     beneficiaire: str
     frequence: str
     details: str = ""
-    fuel_cost: Optional[str] = None
+    fuel_cost: Optional[float] = None
 
 @app.post("/add_entry")
 async def add_entry(entry: FinanceEntry):
