@@ -84,9 +84,7 @@ const TransactionForm = ({ onTransactionAdded }) => {
 
     try {
       // Post the data to the backend. Format the date as YYYY-MM-DD.
-      const response = await axios.post("https://finance-app-w0ya.onrender.com/add_entry", {
-        ...updatedFormData,
-       const d = new Date(updatedFormData.date);
+        const d = new Date(updatedFormData.date);
 
         // Extract day, month, and year, ensuring day and month are always two digits
         const day = d.getDate().toString().padStart(2, '0');
@@ -99,6 +97,9 @@ const TransactionForm = ({ onTransactionAdded }) => {
         // Post the data to the backend with the formatted date
         const response = await axios.post("https://finance-app-w0ya.onrender.com/add_entry", {
           ...updatedFormData,
+      const response = await axios.post("https://finance-app-w0ya.onrender.com/add_entry", {
+        ...updatedFormData,
+
           date: formattedDate
       });
       alert(response.data.message);
