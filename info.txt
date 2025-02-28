@@ -1,0 +1,97 @@
+Below is a detailed summary of the project and the steps we’ve taken so far. You can use this as a reference in future conversations if needed:
+
+---
+
+## **Finance Tracker App – Project Summary**
+
+### **Overview**
+- **Purpose:**  
+  An application to help you manage and track your financial transactions (since around 2016) in a more efficient and professional way. The app stores your transactions in a Google Sheets file, which is then used for visualization in Power BI.
+  
+- **Architecture:**  
+  - **Backend:** Built with FastAPI (Python) that connects to Google Sheets.  
+  - **Frontend:** Built with React (using Vite for fast development) styled with Tailwind CSS.  
+  - **Integration:** Power BI fetches data from the FastAPI endpoints for visualization.
+  - **Deployment:**  
+    - **FastAPI** is deployed on Render.com.  
+    - **React Frontend** is deployed on Vercel.
+
+---
+
+### **Backend (FastAPI) – What We’ve Done**
+1. **API Endpoints:**
+   - **`/add_entry`**:  
+     - Accepts a new transaction with fields like date, title (categorie), type (initially “type_frais”, later standardized in the frontend as “type_transaction”), amount, account, beneficiary, frequency, details, and fuel cost.
+     - Generates an incremental ID for each transaction (so the first column in Google Sheets shows a sequential number rather than a random UUID).
+     - Formats the date (stored as a proper date in Google Sheets, e.g., “DD/MM/YYYY”).
+   - **`/get_entries`**:  
+     - Retrieves all transactions from Google Sheets in a clean JSON format.
+   - **`/get_dropdown_options`**:  
+     - Extracts unique values from specific columns in Google Sheets (e.g., title, type, account, beneficiary, frequency) to populate dropdown lists in the frontend.
+2. **Google Sheets Integration:**
+   - Used a Google Service Account to access Google Sheets.
+   - Initially stored the credentials in a file (`credentials.json`), but later removed them from public repositories and switched to loading them securely via environment variables.
+3. **Security Enhancements:**
+   - Responded to a security alert from Google Cloud regarding exposed credentials.
+   - Rotated the key and updated the code to read credentials from an environment variable (`GOOGLE_CREDENTIALS_JSON`) rather than a file.
+4. **CORS Configuration:**
+   - Configured FastAPI’s CORS middleware to allow requests from the frontend domain (and now generally from all origins, if needed).
+
+5. **Deployment:**
+   - The backend is deployed on Render.com, making it accessible via a public URL (e.g., `https://your-app.onrender.com`).
+
+---
+
+### **Frontend (React/Vite) – What We’ve Done**
+1. **Transaction Form (TransactionForm.jsx):**
+   - A form that collects all necessary transaction fields:
+     - **Date** (with an `<input type="date">` that formats the date correctly)
+     - **Dropdowns for:**  
+       - Title (categorie)  
+       - Type (type_transaction) – originally coming from “type_frais” in the backend  
+       - Account (compte)  
+       - Beneficiary (beneficiaire)  
+       - Frequency (frequence)
+     - **Numeric inputs for amount and fuel cost**, and a text input for details.
+   - **Dynamic Dropdowns:**
+     - The dropdowns are populated by fetching data from the `/get_dropdown_options` endpoint.
+     - Options are **sorted alphabetically** in a case-insensitive manner.
+     - Each option is formatted to have its first letter capitalized.
+   - **Adding New Options:**
+     - Each dropdown includes an extra option (“+ Ajouter une nouvelle option”).
+     - When a user selects this “new” option, an input field appears where a unique new value can be entered.
+     - We fixed the issue by creating **separate state variables for the new value for each dropdown field** (so you can add different new options for each field).
+2. **Deployment:**
+   - The React app is built using Vite and deployed on Vercel.
+   - The frontend now uses the public Render URL (instead of localhost) for all API calls.
+
+---
+
+### **Power BI Integration**
+- **Data Connection:**  
+  Power BI connects to the FastAPI endpoint (`/get_entries` or optionally `/get_entries_csv` for CSV export) to fetch live financial data.
+- **Usage:**  
+  - In Power BI Desktop, you can use **"Get Data → Web"** and point it to the API URL.
+  - Data is then transformed (if needed) and visualized in Power BI dashboards.
+
+---
+
+### **Next Steps & Future Enhancements**
+- **UI Improvements:**  
+  Further polish the frontend with better styling, animations, and possibly more complex components (e.g., transaction tables, filters, reports).
+- **Additional Features:**  
+  Consider adding filtering, editing, or deletion of transactions, and more detailed analytics in Power BI.
+- **Deployment & Security:**  
+  Monitor and manage environment variables and secure deployment practices to ensure your keys and data remain safe.
+
+---
+
+### **Usage for Future Conversations**
+When starting a new conversation about this app, you can refer to this summary to quickly get context on:
+- The overall purpose and architecture.
+- The API endpoints and their roles.
+- How the frontend handles transactions and dynamic dropdowns.
+- How data is connected to Power BI.
+- Deployment details and security measures taken so far.
+
+Feel free to copy and share this summary if you need to continue the discussion elsewhere. Let me know if you need more details or further assistance!
