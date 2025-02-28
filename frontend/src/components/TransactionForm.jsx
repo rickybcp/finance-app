@@ -5,29 +5,29 @@ const TransactionForm = ({ onTransactionAdded }) => {
   // formData stores the currently selected/entered values for each field.
   const [formData, setFormData] = useState({
     date: "",
-    categories: "",
-    type_transactions: "",
+    categorie: "",         // Changed from categories to categorie
+    type_transaction: "",  // Changed from type_transactions to type_transaction
     amount: "",
-    comptes: "",
-    beneficiaires: "",
-    frequences: "",
+    compte: "",            // Changed from comptes to compte
+    beneficiaire: "",      // Changed from beneficiaires to beneficiaire
+    frequence: "",         // Changed from frequences to frequence
     details: "",
     fuel_cost: ""
   });
 
   // newValues stores separate "new" values for each dropdown field.
   const [newValues, setNewValues] = useState({
-    categories: "",
-    type_transactions: "",
-    comptes: "",
-    beneficiaires: "",
-    frequences: ""
+    categorie: "",         // Changed field names to match backend
+    type_transaction: "",
+    compte: "",
+    beneficiaire: "",
+    frequence: ""
   });
 
   // dropdownData holds the list of options fetched from the API.
   const [dropdownData, setDropdownData] = useState({
     categories: [],
-    type_transactions: [],
+    types_frais: [],       // Changed to match API response
     comptes: [],
     beneficiaires: [],
     frequences: []
@@ -48,10 +48,8 @@ const TransactionForm = ({ onTransactionAdded }) => {
         };
 
         setDropdownData({
-          // For "categories", we use the key "categories" from the API response.
           categories: formatOptions(response.data.categories || []),
-          // For "type_transactions", the API returns "types_frais".
-          type_transactions: formatOptions(response.data.types_frais || []),
+          types_frais: formatOptions(response.data.types_frais || []),
           comptes: formatOptions(response.data.comptes || []),
           beneficiaires: formatOptions(response.data.beneficiaires || []),
           frequences: formatOptions(response.data.frequences || [])
@@ -92,9 +90,49 @@ const TransactionForm = ({ onTransactionAdded }) => {
       });
       alert(response.data.message);
       onTransactionAdded();
+      
+      // Reset form after successful submission
+      setFormData({
+        date: "",
+        categorie: "",
+        type_transaction: "",
+        amount: "",
+        compte: "",
+        beneficiaire: "",
+        frequence: "",
+        details: "",
+        fuel_cost: ""
+      });
+      
+      setNewValues({
+        categorie: "",
+        type_transaction: "",
+        compte: "",
+        beneficiaire: "",
+        frequence: ""
+      });
     } catch (error) {
       console.error("Erreur lors de l'ajout:", error);
+      alert("Erreur lors de l'ajout: " + (error.response?.data?.detail || error.message));
     }
+  };
+
+  // Mapping between frontend field names and dropdownData keys
+  const fieldToDataMapping = {
+    categorie: "categories",
+    type_transaction: "types_frais",
+    compte: "comptes",
+    beneficiaire: "beneficiaires",
+    frequence: "frequences"
+  };
+
+  // Mapping between backend field names and frontend labels
+  const fieldLabels = {
+    categorie: "Catégorie",
+    type_transaction: "Type",
+    compte: "Compte",
+    beneficiaire: "Bénéficiaire",
+    frequence: "Fréquence"
   };
 
   return (
@@ -110,23 +148,17 @@ const TransactionForm = ({ onTransactionAdded }) => {
       />
 
       {/* Dropdown fields */}
-      {[
-        { name: "categories", label: "Catégorie", options: dropdownData.categories },
-        { name: "type_transactions", label: "Type", options: dropdownData.type_transactions },
-        { name: "comptes", label: "Compte", options: dropdownData.comptes },
-        { name: "beneficiaires", label: "Bénéficiaire", options: dropdownData.beneficiaires },
-        { name: "frequences", label: "Fréquence", options: dropdownData.frequences }
-      ].map(({ name, label, options }) => (
-        <div key={name} className="relative">
+      {Object.keys(fieldLabels).map(fieldName => (
+        <div key={fieldName} className="relative">
           <select
-            name={name}
-            value={formData[name]}
+            name={fieldName}
+            value={formData[fieldName]}
             onChange={handleChange}
             className="border p-2 rounded w-full"
             required
           >
-            <option value="">{`Sélectionner ${label}`}</option>
-            {options.map((option, index) => (
+            <option value="">{`Sélectionner ${fieldLabels[fieldName]}`}</option>
+            {dropdownData[fieldToDataMapping[fieldName]].map((option, index) => (
               <option key={index} value={option}>
                 {option}
               </option>
@@ -135,12 +167,12 @@ const TransactionForm = ({ onTransactionAdded }) => {
           </select>
 
           {/* If the user selects "new", show an input field specific to this dropdown */}
-          {formData[name] === "new" && (
+          {formData[fieldName] === "new" && (
             <input
               type="text"
-              placeholder={`Nouvelle ${label}`}
-              value={newValues[name] || ""}
-              onChange={(e) => handleNewValueChange(e, name)}
+              placeholder={`Nouvelle ${fieldLabels[fieldName]}`}
+              value={newValues[fieldName] || ""}
+              onChange={(e) => handleNewValueChange(e, fieldName)}
               className="border p-2 rounded w-full mt-2"
             />
           )}
