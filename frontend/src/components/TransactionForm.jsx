@@ -36,8 +36,8 @@ const TransactionForm = ({ onTransactionAdded }) => {
   useEffect(() => {
     const fetchDropdownData = async () => {
       try {
-        // const response = await axios.get("https://finance-app-w0ya.onrender.com/get_dropdown_options");
-        const response = await axios.get("http://127.0.0.1:8000/get_dropdown_options");
+        const response = await axios.get("https://finance-app-w0ya.onrender.com/get_dropdown_options");
+        // const response = await axios.get("http://127.0.0.1:8000/get_dropdown_options");
         console.log("Dropdown Data:", response.data);
   
         const formatOptions = (options) => {
@@ -100,8 +100,8 @@ const TransactionForm = ({ onTransactionAdded }) => {
       const formattedDate = `${year}-${month}-${day}`;
   
       // Post the data to the backend with the formatted date.
-      // const response = await axios.post("https://finance-app-w0ya.onrender.com/add_entry", {
-      const response = await axios.post("http://127.0.0.1:8000/add_entry", {  
+      const response = await axios.post("https://finance-app-w0ya.onrender.com/add_entry", {
+      // const response = await axios.post("http://127.0.0.1:8000/add_entry", {  
         ...updatedFormData,
         date: formattedDate
       });
