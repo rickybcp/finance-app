@@ -34,19 +34,19 @@ const TransactionForm = ({ onTransactionAdded }) => {
   });
 
   useEffect(() => {
-    axios
-      .get("https://finance-app-w0ya.onrender.com/get_dropdown_options")
-      .then(response => {
-        console.log("Dropdown Data:", response.data); // Debug log
-
-        // Function to format options: remove empties, capitalize first letter, sort alphabetically (case-insensitive)
+    const fetchDropdownData = async () => {
+      try {
+        // const response = await axios.get("https://finance-app-w0ya.onrender.com/get_dropdown_options");
+        const response = await axios.get("http://127.0.0.1:8000/get_dropdown_options");
+        console.log("Dropdown Data:", response.data);
+  
         const formatOptions = (options) => {
           return [...new Set(options)]
-            .filter(option => option) // Remove empty values
+            .filter(option => option)
             .map(option => option.charAt(0).toUpperCase() + option.slice(1).toLowerCase())
             .sort((a, b) => a.localeCompare(b, 'fr', { sensitivity: 'base' }));
         };
-
+  
         setDropdownData({
           categories: formatOptions(response.data.categories || []),
           types_frais: formatOptions(response.data.types_frais || []),
@@ -54,8 +54,12 @@ const TransactionForm = ({ onTransactionAdded }) => {
           beneficiaires: formatOptions(response.data.beneficiaires || []),
           frequences: formatOptions(response.data.frequences || [])
         });
-      })
-      .catch(error => console.error("Erreur lors du chargement des données:", error));
+      } catch (error) {
+        console.error("Erreur lors du chargement des données:", error);
+      }
+    };
+  
+    fetchDropdownData();
   }, []);
 
   // Standard change handler for form fields.
@@ -70,10 +74,10 @@ const TransactionForm = ({ onTransactionAdded }) => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
+  
     // Create a copy of formData.
     let updatedFormData = { ...formData };
-
+  
     // For each field that supports new values, if the user selected "new"
     // and provided a new value, update that field.
     Object.keys(newValues).forEach(field => {
@@ -82,30 +86,30 @@ const TransactionForm = ({ onTransactionAdded }) => {
       }
     });
 
+      // Handle empty fuel_cost
+    if (!updatedFormData.fuel_cost) {
+      updatedFormData.fuel_cost = null; // Or "" if the backend expects an empty string
+    }
+  
     try {
-      // Post the data to the backend. Format the date as YYYY-MM-DD.
-        const d = new Date(updatedFormData.date);
-
-        // Extract day, month, and year, ensuring day and month are always two digits
-        const day = d.getDate().toString().padStart(2, '0');
-        const month = (d.getMonth() + 1).toString().padStart(2, '0');
-        const year = d.getFullYear();
-    
-        // Construct the formatted date string in "DD-MM-YYYY"
-        const formattedDate = `${day}-${month}-${year}`;
-    
-        // Post the data to the backend with the formatted date
-        const response = await axios.post("https://finance-app-w0ya.onrender.com/add_entry", {
-          ...updatedFormData,
-      const response = await axios.post("https://finance-app-w0ya.onrender.com/add_entry", {
+      // Format the date as YYYY-MM-DD.
+      const d = new Date(updatedFormData.date);
+      const day = d.getDate().toString().padStart(2, '0');
+      const month = (d.getMonth() + 1).toString().padStart(2, '0');
+      const year = d.getFullYear();
+      const formattedDate = `${year}-${month}-${day}`;
+  
+      // Post the data to the backend with the formatted date.
+      // const response = await axios.post("https://finance-app-w0ya.onrender.com/add_entry", {
+      const response = await axios.post("http://127.0.0.1:8000/add_entry", {  
         ...updatedFormData,
-
-          date: formattedDate
+        date: formattedDate
       });
+  
       alert(response.data.message);
       onTransactionAdded();
-      
-      // Reset form after successful submission
+  
+      // Reset form after successful submission.
       setFormData({
         date: "",
         categorie: "",
@@ -117,7 +121,7 @@ const TransactionForm = ({ onTransactionAdded }) => {
         details: "",
         fuel_cost: ""
       });
-      
+  
       setNewValues({
         categorie: "",
         type_transaction: "",

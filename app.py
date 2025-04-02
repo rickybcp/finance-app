@@ -68,7 +68,7 @@ class FinanceEntry(BaseModel):
     compte: str
     beneficiaire: str
     frequence: str
-    details: str = ""
+    details: Optional[str] = ""
     fuel_cost: Optional[float] = None
 
 @app.post("/add_entry")
