@@ -8,6 +8,11 @@ from pydantic import BaseModel
 from typing import Optional
 import gspread
 from oauth2client.service_account import ServiceAccountCredentials
+from dotenv import load_dotenv
+
+load_dotenv()
+
+client_id = os.getenv("CLIENT_ID")
 
 SCOPES = [
     "https://www.googleapis.com/auth/spreadsheets",
@@ -25,7 +30,7 @@ def get_google_sheet():
         creds = ServiceAccountCredentials.from_json_keyfile_dict(creds_dict, SCOPES)
 
         client = gspread.authorize(creds)
-        return client.open_by_key("1qtK11Ko7wN6gii075ckKItmoNsF0i5PmlLm7CyW-Z4Y").sheet1  # Replace with actual ID
+        return client.open_by_key(client_id).sheet1  # Replace with actual ID
     except Exception as e:
         print("🚨 Google Sheets auth failed:", str(e))
         raise e
